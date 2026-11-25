@@ -9,7 +9,7 @@
   <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-6338A3?style=for-the-badge">
 </p>
 
-<p align="center"><a href="https://t.me/andreyroenko">Связаться в Telegram</a></p>
+<p align="center"><a href="https://t.me/andrey_software_IT">Связаться в Telegram</a></p>
 
 ## Обо мне
 
