@@ -18,6 +18,10 @@ def make_orders():
                     "gross": rng.randint(500, 5000),
                     "returned": int(rng.random() < return_rate),
                 })
+    customers = random.Random(73)
+    for row in rows:
+        month = int(row["order_date"][5:7])
+        row["customer_id"] = customers.randint(1, 65 + month * 40)
     return pd.DataFrame(rows)
 
 
@@ -27,6 +31,15 @@ def main():
     with sqlite3.connect(":memory:") as connection:
         orders.to_sql("orders", connection, index=False)
         metrics = pd.read_sql_query(query, connection)
+        cohorts_query = Path(__file__).with_name("cohorts.sql").read_text(encoding="utf-8")
+        cohorts = pd.read_sql_query(cohorts_query, connection)
+
+    first_month = cohorts["cohort"].eq(cohorts["month"])
+    if not cohorts.loc[first_month, "retention_pct"].eq(100).all():
+        raise ValueError("Each cohort must start at 100% retention")
+    if cohorts["active_customers"].gt(cohorts["customers"]).any():
+        raise ValueError("Active customers exceed cohort size")
+    cohorts.to_csv("customer_retention.csv", index=False)
 
     expected = orders.assign(
         month=orders["order_date"].str[:7],
